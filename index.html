@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sounding Data — Ali Davilan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a08;--bg2:#111110;--bg3:#1a1a17;--ink:#e8e4d9;--ink2:#9e9a8e;--ink3:#5a5750;--gold:#c8a96e;--gold2:#8a6f3e;--line:rgba(200,169,110,0.15);}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--ink);font-family:'EB Garamond',Georgia,serif;font-size:18px;line-height:1.7;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:1000;opacity:0.4;}
+nav{position:fixed;top:0;width:100%;padding:1.2rem 3rem;display:flex;justify-content:space-between;align-items:center;z-index:100;background:linear-gradient(to bottom,var(--bg) 60%,transparent);}
+.nav-logo{font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;}
+.nav-links{display:flex;gap:2rem;list-style:none;}
+.nav-links a{font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--ink3);text-decoration:none;letter-spacing:0.12em;text-transform:uppercase;transition:color 0.3s;}
+.nav-links a:hover{color:var(--gold);}
+#hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:6rem 3rem 4rem;position:relative;overflow:hidden;}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:80px 80px;mask-image:radial-gradient(ellipse 80% 70% at 50% 50%,black 30%,transparent 100%);}
+.waveform{position:absolute;right:-2rem;top:50%;transform:translateY(-50%);width:45vw;height:300px;opacity:0.12;}
+.hero-eyebrow{font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--gold);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:2rem;opacity:0;animation:fadeUp 1s 0.3s forwards;}
+.hero-title{font-size:clamp(3rem,8vw,7rem);font-weight:400;line-height:1.05;letter-spacing:-0.02em;max-width:800px;opacity:0;animation:fadeUp 1s 0.5s forwards;}
+.hero-title em{font-style:italic;color:var(--gold);}
+.hero-sub{margin-top:2.5rem;max-width:520px;color:var(--ink2);font-size:1rem;opacity:0;animation:fadeUp 1s 0.8s forwards;}
+.hero-scroll{position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:0.5rem;opacity:0;animation:fadeUp 1s 1.5s forwards;}
+.scroll-line{width:1px;height:50px;background:linear-gradient(to bottom,var(--gold),transparent);animation:scrollPulse 2s infinite;}
+.scroll-label{font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--ink3);letter-spacing:0.2em;text-transform:uppercase;}
+.sep{border:none;border-top:1px solid var(--line);margin:0;}
+section{padding:6rem 3rem;max-width:1100px;margin:0 auto;}
+.section-label{font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--gold);letter-spacing:0.25em;text-transform:uppercase;margin-bottom:1rem;display:flex;align-items:center;gap:1rem;}
+.section-label::after{content:'';flex:1;height:1px;background:var(--line);max-width:200px;}
+h2{font-size:clamp(2rem,4vw,3.2rem);font-weight:400;line-height:1.15;letter-spacing:-0.01em;margin-bottom:2rem;}
+h2 em{font-style:italic;color:var(--gold);}
+h3{font-size:1.3rem;font-weight:400;margin-bottom:1rem;color:var(--ink);}
+h3 em{font-style:italic;color:var(--gold);}
+.body-text{color:var(--ink2);max-width:640px;font-size:1rem;margin-bottom:1.2rem;}
+.body-text strong{color:var(--ink);font-weight:500;}
+.pull-quote{font-size:clamp(1.4rem,2.5vw,2rem);font-style:italic;color:var(--ink);line-height:1.4;border-left:2px solid var(--gold);padding-left:2rem;margin:3rem 0;max-width:680px;}
+.timeline{margin-top:3rem;position:relative;padding-left:2rem;}
+.timeline::before{content:'';position:absolute;left:0;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,var(--gold2),transparent);}
+.timeline-item{position:relative;margin-bottom:3rem;opacity:0;transform:translateX(-10px);transition:opacity 0.6s,transform 0.6s;}
+.timeline-item.visible{opacity:1;transform:translateX(0);}
+.timeline-item::before{content:'';position:absolute;left:-2.35rem;top:0.6rem;width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 12px var(--gold2);}
+.timeline-tag{font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.4rem;}
+.timeline-title{font-size:1.15rem;font-weight:500;margin-bottom:0.5rem;}
+.timeline-desc{color:var(--ink2);font-size:0.95rem;}
+
+/* Audio cards */
+.listen-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:2rem;}
+.listen-grid.three{grid-template-columns:1fr 1fr 1fr;}
+.audio-card{background:var(--bg2);border:1px solid var(--line);padding:1.5rem;transition:border-color 0.3s;}
+.audio-card:hover{border-color:var(--gold2);}
+.audio-card-label{font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--gold);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:0.5rem;}
+.audio-card-title{font-size:1.05rem;margin-bottom:0.4rem;}
+.audio-card-desc{font-size:0.85rem;color:var(--ink3);margin-bottom:1rem;line-height:1.5;}
+.player{display:flex;align-items:center;gap:0.8rem;}
+.play-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--gold2);background:transparent;color:var(--gold);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.2s;}
+.play-btn:hover{background:var(--gold2);}
+.play-btn svg{width:14px;height:14px;fill:currentColor;pointer-events:none;}
+.progress-bar-wrap{flex:1;height:2px;background:var(--bg3);border-radius:1px;cursor:pointer;}
+.progress-bar-fill{height:100%;background:var(--gold);border-radius:1px;width:0%;}
+.time-label{font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--ink3);white-space:nowrap;min-width:40px;text-align:right;}
+
+/* Subsection */
+.subsection{margin-top:4rem;}
+.subsection-label{font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--ink3);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:0.6rem;}
+
+/* Video */
+.video-wrap{margin-top:2rem;background:var(--bg2);border:1px solid var(--line);padding:1.5rem;}
+.video-wrap p{font-size:0.85rem;color:var(--ink3);margin-bottom:1rem;line-height:1.5;}
+.video-wrap video{width:100%;border-radius:2px;display:block;}
+
+/* Explorer */
+.explorer-wrap{margin-top:3rem;background:var(--bg2);border:1px solid var(--line);padding:2.5rem;}
+.explorer-title{font-size:1rem;margin-bottom:0.4rem;}
+.explorer-sub{font-size:0.85rem;color:var(--ink3);margin-bottom:2rem;line-height:1.5;}
+.sliders-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;margin-bottom:2rem;}
+.slider-group label{display:block;font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.6rem;}
+.slider-val{float:right;color:var(--ink2);}
+input[type=range]{width:100%;-webkit-appearance:none;height:2px;background:var(--bg3);outline:none;border-radius:1px;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--gold);cursor:pointer;border:none;box-shadow:0 0 8px var(--gold2);}
+.slider-desc{font-size:0.78rem;color:var(--ink3);margin-top:0.5rem;line-height:1.4;}
+.generate-btn{background:transparent;border:1px solid var(--gold);color:var(--gold);font-family:'JetBrains Mono',monospace;font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;padding:0.9rem 2rem;cursor:pointer;transition:background 0.2s;}
+.generate-btn:hover{background:rgba(200,169,110,0.08);}
+.explorer-output{margin-top:1.5rem;padding:1.2rem;background:var(--bg3);font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--ink2);min-height:50px;white-space:pre-wrap;display:none;}
+.explorer-output.show{display:block;}
+
+/* Intensity display */
+.intensity-display{display:flex;gap:0.5rem;margin-bottom:1.5rem;flex-wrap:wrap;}
+.intensity-dot{width:10px;height:10px;border-radius:50%;border:1px solid var(--gold2);transition:background 0.2s;}
+.intensity-dot.active{background:var(--gold);}
+
+/* MIDI */
+.midi-box{margin-top:2.5rem;display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
+.midi-option{background:var(--bg2);border:1px solid var(--line);padding:1.8rem;transition:border-color 0.3s;}
+.midi-option:hover{border-color:var(--gold2);}
+.midi-option-num{font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--gold);letter-spacing:0.2em;margin-bottom:0.8rem;}
+.midi-option-title{font-size:1.05rem;margin-bottom:0.6rem;}
+.midi-option-desc{font-size:0.85rem;color:var(--ink3);line-height:1.6;margin-bottom:1.2rem;}
+.midi-link{display:inline-flex;align-items:center;gap:0.5rem;font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--gold);text-decoration:none;letter-spacing:0.1em;border-bottom:1px solid var(--gold2);padding-bottom:2px;transition:color 0.2s;}
+.midi-link:hover{color:var(--ink);}
+.midi-link svg{width:10px;height:10px;fill:currentColor;}
+.upload-zone{border:1px dashed var(--ink3);padding:1.5rem;text-align:center;cursor:pointer;transition:border-color 0.3s;margin-top:1rem;}
+.upload-zone:hover{border-color:var(--gold2);}
+.upload-zone input{display:none;}
+.upload-zone p{font-size:0.82rem;color:var(--ink3);margin-bottom:0.3rem;}
+.upload-name{font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--gold);margin-top:0.5rem;}
+
+/* Study */
+.study-card{margin-top:2.5rem;background:var(--bg2);border:1px solid var(--line);padding:2.5rem;display:grid;grid-template-columns:1fr 1fr;gap:3rem;}
+.study-phase{margin-bottom:1.5rem;}
+.study-phase-num{font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--gold);letter-spacing:0.2em;margin-bottom:0.4rem;}
+.study-phase-title{font-size:1rem;margin-bottom:0.4rem;}
+.study-phase-desc{font-size:0.85rem;color:var(--ink3);line-height:1.6;}
+footer{border-top:1px solid var(--line);padding:3rem;display:flex;justify-content:space-between;align-items:flex-end;}
+.footer-left p{font-size:0.85rem;color:var(--ink3);}
+.footer-left strong{color:var(--ink2);}
+.footer-right{font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--ink3);letter-spacing:0.1em;text-align:right;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+@keyframes scrollPulse{0%,100%{opacity:0.3;}50%{opacity:1;}}
+@media(max-width:768px){nav{padding:1rem 1.5rem;}.nav-links{gap:1rem;}.nav-links a{font-size:0.58rem;}#hero,section{padding:4rem 1.5rem;}.listen-grid,.listen-grid.three,.sliders-grid,.midi-box,.study-card{grid-template-columns:1fr;}.waveform{display:none;}footer{flex-direction:column;gap:1.5rem;}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">Ali Davilan</div>
+  <ul class="nav-links">
+    <li><a href="#question">Question</a></li>
+    <li><a href="#journey">Journey</a></li>
+    <li><a href="#deformation">Deformation</a></li>
+    <li><a href="#generative">Generative</a></li>
+    <li><a href="#explore">Explore</a></li>
+    <li><a href="#study">Study</a></li>
+  </ul>
+</nav>
+
+<div id="hero">
+  <div class="hero-grid"></div>
+  <svg class="waveform" viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg">
+    <polyline fill="none" stroke="#c8a96e" stroke-width="1" points="0,150 20,120 40,160 60,90 80,170 100,110 120,180 140,100 160,160 180,80 200,155 220,115 240,170 260,95 280,150 300,120 320,165 340,85 360,155 380,110 400,175 420,90 440,160 460,115 480,145 500,105 520,165 540,130 560,155 580,120 600,150"/>
+    <polyline fill="none" stroke="#8a6f3e" stroke-width="0.5" opacity="0.6" points="0,150 15,135 30,165 50,125 70,155 90,130 110,170 130,115 150,145 170,125 190,160 210,135 230,165 250,120 270,145 290,130 310,160 330,125 350,155 370,130 390,160 410,120 430,150 450,130 470,155 490,125 510,150 530,135 550,155 570,130 600,150"/>
+  </svg>
+  <div class="hero-eyebrow">Sounding Data</div>
+  <h1 class="hero-title">How does<br><em>wellness</em> sound?</h1>
+  <p class="hero-sub">An ongoing research project exploring whether the felt experience of everyday behavior can be made audible through sonification.</p>
+  <div class="hero-scroll">
+    <span class="scroll-label">Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</div>
+
+<!-- THE QUESTION -->
+<hr class="sep">
+<section id="question">
+  <div class="section-label">The Question</div>
+  <h2>Screen-time is <em>just a number.</em><br>What matters is what it feels like.</h2>
+  <blockquote class="pull-quote">"What began as a simple curiosity — can a phone log sound like anything? — grew into a question about whether musical deformation could carry the weight of lived experience."</blockquote>
+  <p class="body-text">Screen-time data is a number: hours and minutes recorded by a device. But the number is not the experience. Research has shown that heavy screen use tends to co-occur with specific bodily and affective states — <strong>restlessness, mental fatigue, anxiety, a sense of time slipping away.</strong></p>
+  <p class="body-text">This project asks: can those states be made audible? Two approaches were explored in parallel: <strong>deformation</strong> — taking a familiar piece and letting it drift from what it should sound like — and <strong>generative composition</strong> — building music from scratch using the data itself as compositional material. Each approach embeds a different theory of what sonification is for.</p>
+  <p class="body-text">The deformation approach rests on a simple premise: any sound deliberately composed already sounds "right." <strong>The only way to represent deviation from wellness is to take something healthy and let it slip. The deformation is the representation.</strong></p>
+</section>
+
+<!-- JOURNEY -->
+<hr class="sep">
+<section id="journey">
+  <div class="section-label">The Journey</div>
+  <h2>From curiosity<br>to <em>working systems.</em></h2>
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-tag">Origin</div>
+      <div class="timeline-title">A question about a phone log</div>
+      <div class="timeline-desc">The project began with a simple provocation: if a day of screen-time data were mapped onto sound, would it mean anything to a listener? The first experiments were command-line scripts generating music from three activity levels — low, medium, high.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-tag">System I — Generative v1</div>
+      <div class="timeline-title">Building music from data: neutral</div>
+      <div class="timeline-desc">Three layers — a sustained pad, a rhythmic pluck, a synth bass — responded to hourly intensity values. Activity level controlled chord density, register, rhythmic density, and velocity. All in C minor pentatonic — deliberately neutral in its sonic ideology.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-tag">System II — Generative v2</div>
+      <div class="timeline-title">Building music from data: with a value judgment</div>
+      <div class="timeline-desc">The same generative engine, but with a key change: the scale itself shifted with intensity. <strong>Major pentatonic</strong> for low activity (bright, open, resolved), <strong>minor pentatonic</strong> for medium (darker, weighted), <strong>chromatic clusters</strong> for high (tense, unstable, dissonant). The sonic language now carried a value judgment about the data.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-tag">System III — Transformation</div>
+      <div class="timeline-title">Deforming what already exists</div>
+      <div class="timeline-desc">Rather than building music from data, this approach took existing music and deformed it. Beethoven's Piano Sonata No. 25, third movement — vivace, simple, familiar — was chosen because listeners already know what it should sound like. Three independent deformation parameters: <strong>pitch instability, rhythmic jitter, timbral degradation.</strong></div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-tag">System IV — Full Day</div>
+      <div class="timeline-title">A whole day, rendered in sound</div>
+      <div class="timeline-desc">The transformation system was extended to work with real screen-time data — hourly readings from UVA's Link Lab. For any given day, the system generates a continuous sonification: Beethoven deformed hour by hour according to actual usage, with a synchronized video showing the day's bar chart moving in time with the music.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-tag">System V — Interactive</div>
+      <div class="timeline-title">The listener becomes a participant</div>
+      <div class="timeline-desc">The most recent system puts the listener in control. Sliders set the intensity for each hour of a 16-hour day. The user chooses which deformation parameters respond — and whether the sonic language carries a value judgment (major → minor → chromatic) or remains neutral.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-tag">Now — Perception Study</div>
+      <div class="timeline-title">Asking what listeners actually hear</div>
+      <div class="timeline-desc">An ongoing study asks participants to name the states they associate with high screen-time, then evaluate whether each deformation parameter communicates those states. A parallel group evaluates the generative approach. The goal: understand which sonic dimensions carry which affective meanings — and whether deformation or generation communicates more reliably.</div>
+    </div>
+  </div>
+</section>
+
+<!-- DEFORMATION -->
+<hr class="sep">
+<section id="deformation">
+  <div class="section-label">Approach I — Deformation</div>
+  <h2>The same piece.<br><em>Three ways of slipping.</em></h2>
+  <p class="body-text">Beethoven's Piano Sonata No. 25, mvt. 3 is deformed through three independent parameters, each at three intensity levels. Listen to the original first — then hear what each parameter does at low, medium, and high intensity.</p>
+
+  <!-- Original -->
+  <div class="subsection">
+    <div class="subsection-label">Reference</div>
+    <div class="listen-grid" style="grid-template-columns:1fr;">
+      <div class="audio-card">
+        <div class="audio-card-label">Unaltered</div>
+        <div class="audio-card-title">Beethoven Op. 25, mvt. 3 — Original</div>
+        <div class="audio-card-desc">Vivace, playful, almost innocent. The piece before any data touches it. This is the reference point for all deformations below.</div>
+        <div class="player" data-src="audio/beethoven_original.wav">
+          <button class="play-btn" onclick="togglePlay(this)"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+          <div class="progress-bar-wrap" onclick="seekBar(this,event)"><div class="progress-bar-fill"></div></div>
+          <span class="time-label">0:00</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pitch -->
+  <div class="subsection">
+    <div class="subsection-label">Parameter 1 — Pitch instability</div>
+    <p class="body-text" style="font-size:0.9rem;margin-bottom:1.2rem;">Each note is randomly detuned via MIDI pitch bend. The piece drifts from its intended pitches — like a body that cannot find its center. At high intensity, the tonal center dissolves entirely.</p>
+    <div class="listen-grid three">
+      <div class="audio-card">
+        <div class="audio-card-label">Pitch — Low</div>
+        <div class="audio-card-title">Subtle drift</div>
+        <div class="audio-card-desc">Barely noticeable. The piece feels slightly uncertain, unstable around its edges.</div>
+        <div class="player" data-src="audio/beethoven_pitch_low.wav">
+          <button class="play-btn" onclick="togglePlay(this)"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+          <div class="progress-bar-wrap" onclick="seekBar(this,event)"><div class="progress-bar-fill"></div></div>
+          <span class="time-label">0:00</span>
+        </div>
+      </div>
+      <div class="audio-card">
+        <div class="audio-card-label">Pitch — Mid</div>
+        <div class="audio-card-title">Audible detuning</div>
+        <div class="audio-card-desc">The melody is recognizable but every note is slightly off. A persistent wrongness without chaos.</div>
+        <div class="player" data-src="audio/beethoven_pitch_mid.wav">
+          <button class="play-btn" onclick="togglePlay(this)"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+          <div class="progress-bar-wrap" onclick="seekBar(this,event)"><div class="progress-bar-fill"></div></div>
+          <span class="time-label">0:00</span>
+        </div>
+      </div>
+      <div class="audio-card">
+        <div class="audio-card-label">Pitch — High</div>
+        <div class="audio-card-title">Tonal collapse</div>
+        <div class="audio-card-desc">The original melody is barely traceable. Notes wander freely from their intended frequencies.</div>
+        <div class="player" data-src="audio/beethoven_pitch_high.wav">
+          <button class="play-btn" onclick="togglePlay(this)"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+          <div class="progress-bar-wrap" onclick="seekBar(this,event)"><div class="progress-bar-fill"></div></div>
+          <span class="time-label">0:00</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rhythm -->
+  <div class="subsection">
+    <div class="subsection-label">Parameter 2 — Rhythmic jitter</div>
+    <p class="body-text" style="font-size:0.9rem;margin-bottom:1.2rem;">Note onset times are displaced, tempo fluctuates between phrases, and note durations stretch and compress unpredictably. At high intensity, the pulse becomes impossible to follow.</p>
+    <div class="listen-grid three">
+      <div class="audio-card">
+        <div class="audio-card-label">Rhythm — Low</div>
+        <div class="audio-card-title">Slight hesitation</div>
+        <div class="audio-card-desc">The beat wavers. Notes arrive a little early, a little late — like someone playing from memory, not score.</div>
+        <div class="player" data-src="audio/beethoven_rhythm_low.wav">
+          <button class="play-btn" onclick="togglePlay(this)"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+          <div class="progress-bar-wrap" onclick="seekBar(this,event)"><div class="progress-bar-fill"></div></div>
+          <span class="time-label">0:00</span>
+        </div>
+      </div>
+      <div class="audio-card">
+        <div class="audio-card-label">Rhythm — Mid</div>
+        <div class="audio-card-title">Unstable pulse</div>
+        <div class="audio-card-desc">Tempo fluctuates noticeably. Notes cluster and separate. The sense of regular beat is breaking down.</div>
+        <div class="player" data-src="audio/beethoven_rhythm_mid.wav">
+          <button class="play-btn" onclick="togglePlay(this)"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+          <div class="progress-bar-wrap" onclick="seekBar(this,event)"><div class="progress-bar-fill"></div></div>
+          <span class="time-label">0:00</span>
+        </div>
+      </div>
+      <div class="audio-card">
+        <div class="audio-card-label">Rhythm — High</div>
+        <div class="audio-card-title">Temporal collapse</div>
+        <div class="audio-card-desc">Sudden tempo shifts, notes that drag or rush uncontrollably. Time itself seems unreliable.</div>
+        <div class="player" data-src="audio/beethoven_rhythm_high.wav">
+          <button class="play-btn" onclick="togglePlay(this)"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+          <div class="progress-bar-wrap" onclick="seekBar(this,event)"><div class="progress-bar-fill"></div></div>
+          <span class="time-label">0:00</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Timbre -->
+  <div class="subsection">
+    <div class="subsection-label">Parameter 3 — Timbral degradation</div>
+    <p class="body-text" style="font-size:0.9rem;margin-bottom:1.2rem;">Lowpass filtering, phasing, and soft clipping are applied to the rendered audio after synthesis. The sound loses its clarity, becomes foggy and fatigued — as if heard through water, or after hours without rest.</p>
+    <div class="listen-grid three">
+      <div class="audio-card">
+        <div class="audio-card-label">Timbre — Low</div>
+        <div class="audio-card-title">Slight haziness</div>
+        <div class="audio-card-desc">A mild warmth, a subtle filtering. The sound is slightly less crisp than the original.</div>
+        <div class="player" data-src="audio/beethoven_timbre_low.wav">
+          <button class="play-btn" onclick="togglePlay(this)"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+          <div class="progress-bar-wrap" onclick="seekBar(this,event)"><div class="progress-bar-fill"></div></div>
+          <span class="time-label">0:00</span>
+        </div>
+      </div>
+      <div class="audio-card">
+        <div class="audio-card-label">Timbre — Mid</div>
+        <div class="audio-card-title">Foggy, phased</div>
+        <div class="audio-card-desc">A phase effect smears the sound. High frequencies are filtered out. The piece feels distant, fatigued.</div>
+        <div class="player" data-src="audio/beethoven_timbre_mid.wav">
+          <button class="play-btn" onclick="togglePlay(this)"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+          <div class="progress-bar-wrap" onclick="seekBar(this,event)"><div class="progress-bar-fill"></div></div>
+          <span class="time-label">0:00</span>
+        </div>
+      </div>
+      <div class="audio-card">
+        <div class="audio-card-label">Timbre — High</div>
+        <div class="audio-card-title">Heavily degraded</div>
+        <div class="audio-card-desc">Clipping, heavy filtering, phasing. The sound is thick and muddy — almost unrecognizable as piano.</div>
+        <div class="player" data-src="audio/beethoven_timbre_high.wav">
+          <button class="play-btn" onclick="togglePlay(this)"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+          <div class="progress-bar-wrap" onclick="seekBar(this,event)"><div class="progress-bar-fill"></div></div>
+          <span class="time-label">0:00</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Combined -->
+  <div class="subsection">
+    <div class="subsection-label">All Three Together</div>
+    <div class="listen-grid three">
+      <div class="audio-card">
+        <div class="audio-card-label">Combined — Low</div>
+        <div class="audio-card-title">Gentle deformation</div>
+        <div class="audio-card-desc">All three parameters at low intensity. The piece is still clearly Beethoven, but something is subtly off.</div>
+        <div class="player" data-src="audio/beethoven_combined_low.wav">
+          <button class="play-btn" onclick="togglePlay(this)"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+          <div class="progress-bar-wrap" onclick="seekBar(this,event)"><div class="progress-bar-fill"></div></div>
+          <span class="time-label">0:00</span>
+        </div>
+      </div>
+      <div class="audio-card">
+        <div class="audio-card-label">Combined — Mid</div>
+        <div class="audio-card-title">Recognizable, troubled</div>
+        <div class="audio-card-desc">The original melody is still traceable but the piece sounds ill — uncertain in pitch, rhythm, and clarity simultaneously.</div>
+        <div class="player" data-src="audio/beethoven_combined_mid.wav">
+          <button class="play-btn" onclick="togglePlay(this)"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+          <div class="progress-bar-wrap" onclick="seekBar(this,event)"><div class="progress-bar-fill"></div></div>
+          <span class="time-label">0:00</span>
+        </div>
+      </div>
+      <div class="audio-card">
+        <div class="audio-card-label">Combined — High</div>
+        <div class="audio-card-title">The central question</div>
+        <div class="audio-card-desc">All three at maximum. Is this meaningful — or merely broken? This is what the perception study asks.</div>
+        <div class="player" data-src="audio/beethoven_combined_high.wav">
+          <button class="play-btn" onclick="togglePlay(this)"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+          <div class="progress-bar-wrap" onclick="seekBar(this,event)"><div class="progress-bar-fill"></div></div>
+          <span class="time-label">0:00</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GENERATIVE -->
+<hr class="sep">
+<section id="generative">
+  <div class="section-label">Approach II — Generative</div>
+  <h2>Music built<br><em>from the data itself.</em></h2>
+  <p class="body-text">Rather than deforming an existing piece, the generative system constructs music from scratch using screen-time intensity as compositional material. Three instrumental layers — a sustained pad, a rhythmic pluck, and a synth bass — respond to hourly activity values. What changes with intensity is not just loudness or density, but the <strong>harmonic language itself.</strong></p>
+
+  <!-- Three scales -->
+  <div class="subsection">
+    <div class="subsection-label">The three harmonic modes</div>
+    <p class="body-text" style="font-size:0.9rem;margin-bottom:1.5rem;">Low screen-time generates music in <strong>major pentatonic</strong> — open, resolved, bright. Medium generates <strong>minor pentatonic</strong> — darker, weighted, ambivalent. High intensity produces <strong>chromatic clusters</strong> — tense, dissonant, unstable. The choice of scale is itself an ideological act: the system encodes a value judgment about what high screen-time means.</p>
+    <div class="listen-grid three">
+      <div class="audio-card">
+        <div class="audio-card-label">Low intensity — Major pentatonic</div>
+        <div class="audio-card-title">A settled day</div>
+        <div class="audio-card-desc">Open, bright, resolved. Low chord density, sparse rhythm, soft bass. A day with space in it.</div>
+        <div class="player" data-src="audio/gen_low.wav">
+          <button class="play-btn" onclick="togglePlay(this)"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+          <div class="progress-bar-wrap" onclick="seekBar(this,event)"><div class="progress-bar-fill"></div></div>
+          <span class="time-label">0:00</span>
+        </div>
+      </div>
+      <div class="audio-card">
+        <div class="audio-card-label">Mid intensity — Minor pentatonic</div>
+        <div class="audio-card-title">A weighted day</div>
+        <div class="audio-card-desc">Darker, denser. The chord fills in, the rhythm quickens, the bass becomes more present. Something is accumulating.</div>
+        <div class="player" data-src="audio/gen_mid.wav">
+          <button class="play-btn" onclick="togglePlay(this)"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+          <div class="progress-bar-wrap" onclick="seekBar(this,event)"><div class="progress-bar-fill"></div></div>
+          <span class="time-label">0:00</span>
+        </div>
+      </div>
+      <div class="audio-card">
+        <div class="audio-card-label">High intensity — Chromatic</div>
+        <div class="audio-card-title">A saturated day</div>
+        <div class="audio-card-desc">Dissonant cluster chords, dense rapid figures, aggressive bass. The system has moved outside conventional harmony entirely.</div>
+        <div class="player" data-src="audio/gen_high.wav">
+          <button class="play-btn" onclick="togglePlay(this)"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+          <div class="progress-bar-wrap" onclick="seekBar(this,event)"><div class="progress-bar-fill"></div></div>
+          <span class="time-label">0:00</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Patterns -->
+  <div class="subsection">
+    <div class="subsection-label">Patterns across a day</div>
+    <p class="body-text" style="font-size:0.9rem;margin-bottom:1.5rem;">Screen-time rarely stays constant. These examples show three different daily patterns: alternating high and low, gradually ascending, and gradually descending. Each transition between intensity levels is audible — a fast rush upward when activity rises, a single beat and silence when it falls.</p>
+    <div class="listen-grid three">
+      <div class="audio-card">
+        <div class="audio-card-label">Pattern — Alternating</div>
+        <div class="audio-card-title">Low → High → Low → High</div>
+        <div class="audio-card-desc">The system oscillates between settled and saturated. Transitions are abrupt — the music jumps between harmonic worlds.</div>
+        <div class="player" data-src="audio/gen_pattern_lohi.wav">
+          <button class="play-btn" onclick="togglePlay(this)"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+          <div class="progress-bar-wrap" onclick="seekBar(this,event)"><div class="progress-bar-fill"></div></div>
+          <span class="time-label">0:00</span>
+        </div>
+      </div>
+      <div class="audio-card">
+        <div class="audio-card-label">Pattern — Ascending</div>
+        <div class="audio-card-title">Low → Mid → High</div>
+        <div class="audio-card-desc">A day that escalates. The music moves from open to weighted to tense — a slow harmonic darkening.</div>
+        <div class="player" data-src="audio/gen_pattern_ascending.wav">
+          <button class="play-btn" onclick="togglePlay(this)"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+          <div class="progress-bar-wrap" onclick="seekBar(this,event)"><div class="progress-bar-fill"></div></div>
+          <span class="time-label">0:00</span>
+        </div>
+      </div>
+      <div class="audio-card">
+        <div class="audio-card-label">Pattern — Descending</div>
+        <div class="audio-card-title">High → Mid → Low</div>
+        <div class="audio-card-desc">A day that winds down. Dissonance resolves to ambivalence to openness — the system coming to rest.</div>
+        <div class="player" data-src="audio/gen_pattern_descending.wav">
+          <button class="play-btn" onclick="togglePlay(this)"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+          <div class="progress-bar-wrap" onclick="seekBar(this,event)"><div class="progress-bar-fill"></div></div>
+          <span class="time-label">0:00</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full day with video -->
+  <div class="subsection">
+    <div class="subsection-label">A full day — real data + synchronized video</div>
+    <p class="body-text" style="font-size:0.9rem;">This example uses real hourly screen-time data collected by UVA's Link Lab. The music plays continuously through 24 hours of data — the deformation approach applied to Beethoven, hour by hour. The synchronized video shows the day's bar chart with a playhead moving in time with the music, so the listener can see and hear the data simultaneously.</p>
+    <div class="video-wrap">
+      <p>Sonification of a real screen-time day — August 9, 2022 — from the Link Lab dataset. Each hour of data corresponds to one phrase of the deformed Beethoven. Watch the bar chart move with the sound.</p>
+      <video controls>
+        <source src="audio/fullday_video.mp4" type="video/mp4">
+        Your browser does not support video playback.
+      </video>
+    </div>
+  </div>
+</section>
+
+<!-- EXPLORE -->
+<hr class="sep">
+<section id="explore">
+  <div class="section-label">Explore</div>
+  <h2>Shape the<br><em>deformation.</em></h2>
+  <p class="body-text">Adjust any combination of the three parameters independently and press play. Each slider controls one dimension — they can be mixed freely. This demo plays pre-rendered samples mapped to the closest matching combination.</p>
+
+  <div class="explorer-wrap">
+    <div class="explorer-title">Deformation Explorer</div>
+    <div class="explorer-sub">Move any slider, then press play. Each parameter works independently — combine them freely.<br>0 = no deformation. 1 = low. 2 = mid. 3 = high.</div>
+
+    <div class="sliders-grid">
+      <div class="slider-group">
+        <label>Pitch instability <span class="slider-val" id="pv">0</span></label>
+        <div class="intensity-display" id="pitch-dots">
+          <div class="intensity-dot"></div><div class="intensity-dot"></div><div class="intensity-dot"></div>
+        </div>
+        <input type="range" min="0" max="3" value="0" id="pitch-sl" oninput="updateSlider('pitch-sl','pv','pitch-dots')">
+        <div class="slider-desc">Randomises the tuning of each note via MIDI pitch bend. 0 = original. 3 = tonal collapse.</div>
+      </div>
+      <div class="slider-group">
+        <label>Rhythmic jitter <span class="slider-val" id="rv">0</span></label>
+        <div class="intensity-display" id="rhythm-dots">
+          <div class="intensity-dot"></div><div class="intensity-dot"></div><div class="intensity-dot"></div>
+        </div>
+        <input type="range" min="0" max="3" value="0" id="rhythm-sl" oninput="updateSlider('rhythm-sl','rv','rhythm-dots')">
+        <div class="slider-desc">Displaces note timing, fluctuates tempo, stretches durations. 0 = original. 3 = temporal collapse.</div>
+      </div>
+      <div class="slider-group">
+        <label>Timbral degradation <span class="slider-val" id="tv">0</span></label>
+        <div class="intensity-display" id="timbre-dots">
+          <div class="intensity-dot"></div><div class="intensity-dot"></div><div class="intensity-dot"></div>
+        </div>
+        <input type="range" min="0" max="3" value="0" id="timbre-sl" oninput="updateSlider('timbre-sl','tv','timbre-dots')">
+        <div class="slider-desc">Applies filtering, phasing, and clipping post-render. 0 = clear. 3 = heavily degraded.</div>
+      </div>
+    </div>
+
+    <button class="generate-btn" onclick="playExplorer()">&#9654;&nbsp;&nbsp;Play this combination</button>
+    <div class="explorer-output" id="explorer-out"></div>
+  </div>
+</section>
+
+<!-- MAKE IT YOURS -->
+<hr class="sep">
+<section id="midi-section">
+  <div class="section-label">Make It Yours</div>
+  <h2>Bring your<br><em>own melody.</em></h2>
+  <p class="body-text">The deformation system works on any MIDI file. Use the built-in Beethoven excerpt, or compose your own using Google's Bach Doodle — an AI tool that harmonises your melody in the style of J.S. Bach — then upload it here.</p>
+  <div class="midi-box">
+    <div class="midi-option">
+      <div class="midi-option-num">Option A</div>
+      <div class="midi-option-title">Use the Beethoven excerpt</div>
+      <div class="midi-option-desc">The opening measures of Op. 25, mvt. 3 — loaded as the default. Familiar enough that any deformation reads clearly as a departure from something known.</div>
+      <a class="midi-link" href="audio/beethoven_original.wav">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+        Preview original
+      </a>
+    </div>
+    <div class="midi-option">
+      <div class="midi-option-num">Option B</div>
+      <div class="midi-option-title">Compose your own</div>
+      <div class="midi-option-desc">Visit Google's Bach Doodle, compose a short melody, and export it as MIDI. Upload it below — the deformation system will transform it the same way it treats Beethoven.</div>
+      <a class="midi-link" href="https://doodles.google/doodle/celebrating-johann-sebastian-bach/" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+        Open Bach Doodle &#8599;
+      </a>
+      <div class="upload-zone" onclick="document.getElementById('midi-input').click()">
+        <input type="file" id="midi-input" accept=".mid,.midi" onchange="handleMidi(this)">
+        <p>Click to upload your MIDI file</p>
+        <p style="font-size:0.75rem;">.mid or .midi accepted</p>
+        <div class="upload-name" id="midi-name"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STUDY -->
+<hr class="sep">
+<section id="study">
+  <div class="section-label">The Study</div>
+  <h2>Can listeners<br><em>hear the difference?</em></h2>
+  <p class="body-text">An ongoing perception study asks whether each deformation parameter communicates specific affective states — and whether what listeners hear depends on what they personally associate with high screen-time.</p>
+  <div class="study-card">
+    <div>
+      <div class="study-phase">
+        <div class="study-phase-num">Phase 1</div>
+        <div class="study-phase-title">Personal mapping</div>
+        <div class="study-phase-desc">Research has shown that heavy screen use co-occurs with specific bodily states. Participants select three that resonate with their own experience: restlessness, mental fatigue, anxiety, emptiness, time-loss, sleep disturbance.</div>
+      </div>
+      <div class="study-phase">
+        <div class="study-phase-num">Phase 2</div>
+        <div class="study-phase-title">Listening task</div>
+        <div class="study-phase-desc">Thirteen musical excerpts, each deforming the Beethoven piece through one or more parameters at varying intensities. After each, participants rate the three states they chose — and how strongly the excerpt evokes a high screen-time day.</div>
+      </div>
+    </div>
+    <div>
+      <div class="study-phase">
+        <div class="study-phase-num">Phase 3</div>
+        <div class="study-phase-title">Reflection</div>
+        <div class="study-phase-desc">Participants reflect on whether listening gave them a different kind of insight than looking at a graph would have. Open-text responses probe what the music communicated that numbers could not.</div>
+      </div>
+      <div class="study-phase">
+        <div class="study-phase-num">Parallel arm</div>
+        <div class="study-phase-title">Two approaches compared</div>
+        <div class="study-phase-desc">A second group evaluates music generated from scratch using an algorithmic system by Miya. Same states, same sliders — asking whether familiarity-with-deviation carries meaning differently than generation from nothing.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-left">
+    <p><strong>Ali Davilan</strong></p>
+    <p>PhD student &middot;</p>
+    <p>University of Virginia</p>
+    <p style="margin-top:0.8rem;">Part of a larger inquiry into sonification, digital wellbeing, and the felt life of data.</p>
+  </div>
+  <div class="footer-right">
+    <p>Curating Sound &middot; Noel Lobley</p>
+    <p>University of Virginia &middot; Spring 2026</p>
+    <p style="margin-top:0.5rem;color:var(--ink3);">Built from data,<br>one note at a time.</p>
+  </div>
+</footer>
+
+<script>
+// ── Audio player ───────────────────────────────────────────────────────
+let currentAudio=null, currentBtn=null;
+const PLAY ='<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+const PAUSE='<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+
+function togglePlay(btn){
+  const player=btn.closest('.player');
+  const fill=player.querySelector('.progress-bar-fill');
+  const time=player.querySelector('.time-label');
+  if(currentAudio&&currentBtn!==btn){
+    currentAudio.pause();currentBtn.innerHTML=PLAY;
+    currentBtn.closest('.player').querySelector('.progress-bar-fill').style.width='0%';
+  }
+  if(!btn._audio){
+    btn._audio=new Audio(player.dataset.src);
+    btn._audio.addEventListener('timeupdate',()=>{
+      const p=(btn._audio.currentTime/btn._audio.duration)*100||0;
+      fill.style.width=p+'%';
+      const s=Math.floor(btn._audio.currentTime%60).toString().padStart(2,'0');
+      time.textContent=Math.floor(btn._audio.currentTime/60)+':'+s;
+    });
+    btn._audio.addEventListener('ended',()=>{btn.innerHTML=PLAY;fill.style.width='0%';time.textContent='0:00';});
+    btn._audio.addEventListener('error',()=>{time.textContent='N/A';});
+  }
+  if(btn._audio.paused){
+    btn._audio.play().catch(()=>{time.textContent='err';});
+    btn.innerHTML=PAUSE;currentAudio=btn._audio;currentBtn=btn;
+  }else{btn._audio.pause();btn.innerHTML=PLAY;}
+}
+
+function seekBar(bar,e){
+  const btn=bar.closest('.player').querySelector('.play-btn');
+  if(!btn._audio)return;
+  btn._audio.currentTime=(e.clientX-bar.getBoundingClientRect().left)/bar.offsetWidth*btn._audio.duration;
+}
+
+// ── Slider dots ───────────────────────────────────────────────────────
+function updateSlider(slId,valId,dotsId){
+  const v=+document.getElementById(slId).value;
+  document.getElementById(valId).textContent=v;
+  const dots=document.getElementById(dotsId).querySelectorAll('.intensity-dot');
+  dots.forEach((d,i)=>d.classList.toggle('active',i<v));
+}
+
+// ── Explorer ──────────────────────────────────────────────────────────
+// Maps pitch/rhythm/timbre levels to pre-rendered files
+// Each parameter independent: pick dominant non-zero parameter
+// When multiple active, use combined files
+const SAMPLE_MAP = {
+  // single parameter
+  '100': 'audio/beethoven_pitch_low.wav',
+  '200': 'audio/beethoven_pitch_mid.wav',
+  '300': 'audio/beethoven_pitch_high.wav',
+  '010': 'audio/beethoven_rhythm_low.wav',
+  '020': 'audio/beethoven_rhythm_mid.wav',
+  '030': 'audio/beethoven_rhythm_high.wav',
+  '001': 'audio/beethoven_timbre_low.wav',
+  '002': 'audio/beethoven_timbre_mid.wav',
+  '003': 'audio/beethoven_timbre_high.wav',
+  // combined
+  '111': 'audio/beethoven_combined_low.wav',
+  '222': 'audio/beethoven_combined_mid.wav',
+  '333': 'audio/beethoven_combined_high.wav',
+  '000': 'audio/beethoven_original.wav',
+};
+
+const PARAM_NAMES = ['pitch','rhythm','timbre'];
+const LEVEL_NAMES = ['','low','mid','high'];
+
+let exAudio=null;
+
+function playExplorer(){
+  const p=+document.getElementById('pitch-sl').value;
+  const r=+document.getElementById('rhythm-sl').value;
+  const t=+document.getElementById('timbre-sl').value;
+
+  const key=p+''+r+''+t;
+  let src=SAMPLE_MAP[key];
+  let desc='';
+
+  if(src){
+    if(key==='000') desc='Original — no deformation applied.';
+    else if(key==='111') desc='All three at low intensity (combined).';
+    else if(key==='222') desc='All three at mid intensity (combined).';
+    else if(key==='333') desc='All three at high intensity (combined).';
+    else{
+      const active=[];
+      if(p>0) active.push('pitch ('+LEVEL_NAMES[p]+')');
+      if(r>0) active.push('rhythm ('+LEVEL_NAMES[r]+')');
+      if(t>0) active.push('timbre ('+LEVEL_NAMES[t]+')');
+      desc='Playing: '+active.join(', ')+'.';
+    }
+  } else {
+    // fallback: pick dominant parameter
+    const vals=[p,r,t];
+    const max=Math.max(p,r,t);
+    if(max===0){src=SAMPLE_MAP['000'];desc='Original.';}
+    else{
+      const di=vals.indexOf(max);
+      const fkey=['','',''].map((_,i)=>i===di?max:0).join('');
+      // build correct 3-char key
+      const pk=di===0?max:0;
+      const rk=di===1?max:0;
+      const tk=di===2?max:0;
+      const fkey2=''+pk+rk+tk;
+      src=SAMPLE_MAP[fkey2]||SAMPLE_MAP['000'];
+      desc='Closest match: '+PARAM_NAMES[di]+' ('+LEVEL_NAMES[max]+') dominant. Mixed combinations play as closest single-parameter sample.';
+    }
+  }
+
+  const out=document.getElementById('explorer-out');
+  out.classList.add('show');
+  out.textContent=desc;
+
+  if(exAudio){exAudio.pause();}
+  exAudio=new Audio(src);
+  exAudio.play().catch(()=>{
+    out.textContent='Audio not found. Run setup_audio.py first, then reload.';
+  });
+  exAudio.addEventListener('ended',()=>{out.textContent=desc+'   [done]';});
+}
+
+// ── MIDI upload ───────────────────────────────────────────────────────
+function handleMidi(input){
+  const file=input.files[0];if(!file)return;
+  document.getElementById('midi-name').textContent='v  '+file.name+' loaded';
+  const out=document.getElementById('explorer-out');
+  out.classList.add('show');
+  out.textContent='MIDI loaded: '+file.name+'\nIn the full system, this would now be transformed by the parameters above.\nRun study_app.py locally to hear live generation from your own MIDI file.';
+}
+
+// ── Scroll reveal ─────────────────────────────────────────────────────
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});
+},{threshold:0.15});
+document.querySelectorAll('.timeline-item').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
